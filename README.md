@@ -26,26 +26,16 @@ npm start
 
 The Express server serves the built `dist/` directory and the API from the same origin. Set `PORT` if needed.
 
-## Deploy the backend for the Android APK
+## Built-in OpenRouter for Android
 
-The APK cannot use the Vite development proxy or a relative `/api` path: those resolve to the APK's local web assets and can return HTML instead of API JSON. Deploy the backend as a public HTTPS web service first.
+The Android app now uses OpenRouter by default and no longer shows an API & connection settings page. The OpenRouter credential must stay on the server; it is intentionally not embedded in the APK or committed to this public repository.
 
-1. In Render, choose **New → Blueprint** and connect this repository. Render will read `render.yaml` and create the `lokizenith-ai-api` web service.
-2. Wait until the service is live. Open `https://YOUR-SERVICE.onrender.com/api/health`; it should return JSON containing `"ok": true`.
-3. In Lokizenith AI, open **Settings → API & connection** and paste the service's base URL (without `/api/health`) into **Lokizenith backend URL**.
-4. Enter and save your provider key, then run **Test connection**.
+1. In Render, choose **New → Blueprint** and connect this repository. Render reads `render.yaml` and creates the `lokizenith-ai-api` service.
+2. When prompted, enter a **newly rotated** OpenRouter key for the `OPENROUTER_API_KEY` secret. Do not reuse a key that has been pasted into a chat or committed to source.
+3. Wait for the service to become live, then check `https://lokizenith-ai-api.onrender.com/api/health` for JSON containing `"ok": true`.
+4. The Android app is configured to use that service URL automatically. No API key or backend URL needs to be entered in the app.
 
-The backend URL is stored locally on that device. The first request on Render's free plan may take a little longer if the service has been sleeping.
-
-## API key setup
-
-You can enter your provider and key in Settings → API & connection. Those settings are saved in this browser profile so they remain after refresh. Do not use that option on shared devices. Alternatively, set a server-side key in `.env`:
-
-- `LOKIZENITH_GEMINI_API_KEY`
-- `LOKIZENITH_CUSTOM_API_KEY`
-- `LOKIZENITH_API_KEY`
-
-Provider settings in the app take precedence over server-side fallback keys. Never commit `.env` or real API keys.
+Render's free service may take a little longer to respond after sleeping. Never commit real API keys or `.env` files.
 
 ## Included
 - Lokizenith 3.2 Ostring and 3.5 Feranite chat personalities
