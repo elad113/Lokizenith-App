@@ -1,0 +1,17 @@
+{
+  "name": "Lokizenith AI",
+  "short_name": "Lokizenith",
+  "description": "Lokizenith AI assistant",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#08140f",
+  "theme_color": "#08140f",
+  "icons": [
+    {
+      "src": "/lokizenith-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
