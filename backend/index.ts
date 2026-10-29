@@ -9,7 +9,7 @@ app.use(cors());
 app.use(express.json({ limit: '24mb' }));
 const json = (data: unknown) => ({ __lokizenithResponse: true, statusCode: 200, body: data });
 const error = (message: string, statusCode = 400) => ({ __lokizenithResponse: true, statusCode, body: { error: message, message } });
-const secretNames = () => ['LOKIZENITH_CUSTOM_API_KEY', 'LOKIZENITH_GEMINI_API_KEY', 'LOKIZENITH_API_KEY'].filter(name => Boolean(process.env[name]));
+const secretNames = () => ['OPENROUTER_API_KEY', 'LOKIZENITH_CUSTOM_API_KEY', 'LOKIZENITH_GEMINI_API_KEY', 'LOKIZENITH_API_KEY'].filter(name => Boolean(process.env[name]));
 async function scrapeUrl(url: string) {
   const response = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0 (compatible; LokizenithAI/1.0)' }, signal: AbortSignal.timeout(12000) });
   const html = await response.text();
@@ -87,7 +87,7 @@ async function geminiRequest(key: string, model: string, payload: Record<string,
 }
 type ProviderConfig = { provider: string; model: string; baseUrl: string };
 function providerConfig(input: { provider?: string; apiModel?: string; apiBaseUrl?: string }, advanced = false): ProviderConfig {
-  const provider = (input.provider || 'gemini').toLowerCase();
+  const provider = (input.provider || 'openrouter').toLowerCase();
   const defaults: Record<string, { model: string; baseUrl: string }> = {
     gemini: { model: advanced ? ADVANCED_MODEL : DEFAULT_MODEL, baseUrl: '' },
     groq: { model: 'llama-3.3-70b-versatile', baseUrl: 'https://api.groq.com/openai/v1' },
@@ -120,11 +120,11 @@ function openAIMessages(system: string, history: ChatMessage[], prompt: string, 
 async function getKey(suppliedKey?: string) {
   const customKey = typeof suppliedKey === 'string' ? suppliedKey.trim() : '';
   if (customKey) return customKey;
-  for (const name of ['LOKIZENITH_CUSTOM_API_KEY', 'LOKIZENITH_GEMINI_API_KEY', 'LOKIZENITH_API_KEY']) {
+  for (const name of ['OPENROUTER_API_KEY', 'LOKIZENITH_CUSTOM_API_KEY', 'LOKIZENITH_GEMINI_API_KEY', 'LOKIZENITH_API_KEY']) {
     const key = process.env[name]?.trim();
     if (key) return key;
   }
-  throw new Error('Google Gemini API key is not configured. Add it through secure secret entry.');
+  throw new Error('OpenRouter API key is not configured on the server. Set the OPENROUTER_API_KEY environment secret.');
 }
 function contentsFrom(history: ChatMessage[], prompt: string, fileText: string, images: ImageInput[]) {
   const contents: Array<{ role: string; parts: Array<Record<string, unknown>> }> = [];
@@ -145,7 +145,7 @@ function contentsFrom(history: ChatMessage[], prompt: string, fileText: string, 
 const routeTable: Record<string, Array<(context: any) => Promise<any>>> = {
   'GET /api/health': [async () => {
     const names = secretNames();
-    return json({ ok: true, app: 'Lokizenith AI', provider: 'Google Gemini', googleKeyConfigured: names.includes('LOKIZENITH_GEMINI_API_KEY') || names.includes('LOKIZENITH_API_KEY'), activeSecret: names.includes('LOKIZENITH_GEMINI_API_KEY') ? 'LOKIZENITH_GEMINI_API_KEY' : names.includes('LOKIZENITH_API_KEY') ? 'LOKIZENITH_API_KEY' : null });
+    return json({ ok: true, app: 'Lokizenith AI', provider: 'OpenRouter', openRouterKeyConfigured: names.includes('OPENROUTER_API_KEY'), activeSecret: names.includes('OPENROUTER_API_KEY') ? 'OPENROUTER_API_KEY' : null });
   }],
   'POST /api/test-connection': [async ({ body }) => {
     const input = (body || {}) as { apiKey?: string; provider?: string; apiModel?: string; apiBaseUrl?: string };
