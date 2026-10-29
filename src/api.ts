@@ -30,7 +30,7 @@ async function request<T>(method: string, url: string, body?: unknown): Promise<
   const contentType = response.headers.get('content-type') || '';
   const text = await response.text();
   if (contentType.includes('text/html') || /^\s*(<!doctype html|<html[\s>])/i.test(text)) {
-    throw new Error('The API returned an HTML page instead of JSON. This usually means the backend URL is missing or points to the frontend. Configure VITE_API_BASE_URL to the deployed Lokizenith backend URL.');
+    throw new Error('The API returned an HTML page instead of JSON. This usually means the backend URL is missing or points to the frontend. Open Settings → API & connection and enter the deployed Lokizenith backend URL.');
   }
 
   let data: any = {};
