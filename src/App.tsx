@@ -116,6 +116,7 @@ function App() {
   const [apiProvider, setApiProvider] = useState(() => readStore('lokizenith.api', { key: '', provider: 'groq', model: 'llama-3.3-70b-versatile', baseUrl: '' }).provider);
   const [apiModel, setApiModel] = useState(() => readStore('lokizenith.api', { key: '', provider: 'groq', model: 'llama-3.3-70b-versatile', baseUrl: '' }).model);
   const [apiBaseUrl, setApiBaseUrl] = useState(() => readStore('lokizenith.api', { key: '', provider: 'groq', model: 'llama-3.3-70b-versatile', baseUrl: '' }).baseUrl);
+  const [backendUrl, setBackendUrl] = useState(() => readStore('lokizenith.server', ''));
   const [quizAnswers, setQuizAnswers] = useState<Record<string, number>>({});
   const [chatSearch, setChatSearch] = useState('');
   const [showChatSearch, setShowChatSearch] = useState(false);
@@ -1433,6 +1434,9 @@ function App() {
                 ) : settingsTab === 'API & connection' ? (
                   <>
                     <p className="settings-intro">Choose your API provider and model, then paste your key. Groq, OpenRouter, Google Gemini, and custom OpenAI-compatible endpoints work for chat, LokiCode, and presentations.</p>
+                    <label className="api-key-input-label" htmlFor="lokizenith-backend-url">Lokizenith backend URL (required in the APK)</label>
+                    <input id="lokizenith-backend-url" className="api-key-input" type="url" inputMode="url" value={backendUrl} onChange={e => { const value = e.target.value.trim(); setBackendUrl(value); localStorage.setItem('lokizenith.server', JSON.stringify(value)); }} placeholder="https://your-lokizenith-backend.onrender.com" />
+                    <p className="small-note">This is the server hosting Lokizenith's /api endpoints, not the Groq/Gemini provider URL. Deploy the repository's render.yaml first, then paste the service URL here.</p>
                     <label className="api-key-input-label" htmlFor="lokizenith-provider">API provider</label>
                     <select id="lokizenith-provider" className="api-key-input" value={apiProvider} onChange={e => { const p = e.target.value; setApiProvider(p); if (p === 'groq') { setApiModel('llama-3.3-70b-versatile'); setApiBaseUrl(''); } else if (p === 'openrouter') { setApiModel('openrouter/auto'); setApiBaseUrl(''); } else if (p === 'gemini') { setApiModel('gemini-2.5-flash'); setApiBaseUrl(''); } else { setApiModel(''); setApiBaseUrl(''); } }}><option value="groq">Groq</option><option value="openrouter">OpenRouter</option><option value="gemini">Google Gemini</option><option value="custom">Custom OpenAI-compatible API</option></select>
                     <label className="api-key-input-label" htmlFor="lokizenith-model">Model ID</label>
@@ -1551,6 +1555,7 @@ function App() {
                 onClick={() => {
                   localStorage.setItem('lokizenith.prefs', JSON.stringify(prefs));
                   localStorage.setItem('lokizenith.api', JSON.stringify({ key: activeApiKey || apiKeyDraft.trim(), provider: apiProvider, model: apiModel.trim(), baseUrl: apiBaseUrl.trim() }));
+                  localStorage.setItem('lokizenith.server', JSON.stringify(backendUrl.trim().replace(/\\/+$/, '')));
                   if (apiKeyDraft.trim()) setActiveApiKey(apiKeyDraft.trim());
                   setSettingsOpen(false);
                   setToast('Settings saved on this device');
