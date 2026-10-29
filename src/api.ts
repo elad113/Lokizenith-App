@@ -3,7 +3,7 @@ type ApiResponse<T> = { data: T };
 function configuredApiBaseUrl() {
   let saved = '';
   try { saved = JSON.parse(localStorage.getItem('lokizenith.server') || '""') as string; } catch { /* Ignore invalid local settings. */ }
-  return (saved || import.meta.env.VITE_API_BASE_URL || '').trim().replace(/\/+$/, '');
+  return (saved || import.meta.env.VITE_API_BASE_URL || 'https://lokizenith-ai-api.onrender.com').trim().replace(/\/+$/, '');
 }
 
 function apiUrl(url: string) {
@@ -24,13 +24,13 @@ async function request<T>(method: string, url: string, body?: unknown): Promise<
   } catch {
     throw new Error(configuredApiBaseUrl()
       ? 'Cannot reach the Lokizenith API server. Check the backend URL and that the server is running.'
-      : 'The Lokizenith API server is not configured. Enter the deployed backend URL in Settings → API & connection.');
+      : 'The built-in Lokizenith service could not be reached. Check that the service is deployed and online.');
   }
 
   const contentType = response.headers.get('content-type') || '';
   const text = await response.text();
   if (contentType.includes('text/html') || /^\s*(<!doctype html|<html[\s>])/i.test(text)) {
-    throw new Error('The API returned an HTML page instead of JSON. This usually means the backend URL is missing or points to the frontend. Open Settings → API & connection and enter the deployed Lokizenith backend URL.');
+    throw new Error('The API returned an HTML page instead of JSON. This usually means the backend URL is missing or points to the frontend. Check that the built-in Lokizenith service is deployed and online.');
   }
 
   let data: any = {};
