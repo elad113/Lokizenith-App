@@ -8,7 +8,8 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "server": "tsx backend/index.ts",
-    "start": "tsx backend/index.ts"
+    "start": "tsx backend/index.ts",
+    "android:sync": "npm run build && cap sync android"
   },
   "dependencies": {
     "cors": "^2.8.5",
@@ -16,7 +17,9 @@
     "lucide-react": "^0.469.0",
     "pptxgenjs": "^3.12.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "@capacitor/core": "^7.4.3",
+    "@capacitor/android": "^7.4.3"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
@@ -30,6 +33,7 @@
     "tailwindcss": "^3.4.0",
     "tsx": "^4.19.2",
     "typescript": "^5.7.0",
-    "vite": "^6.0.0"
+    "vite": "^6.0.0",
+    "@capacitor/cli": "^7.4.3"
   }
 }
