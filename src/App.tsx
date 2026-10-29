@@ -460,7 +460,7 @@ function App() {
         slide.addShape(pptx.ShapeType.ellipse, { x: 10.4, y: -0.5, w: 3.4, h: 3.4, line: { color: '25C978', transparency: 100 }, fill: { color: '25C978', transparency: 72 } });
         slide.addText(item.title || deck.title, { x: 0.75, y: 0.55, w: 11.5, h: 0.8, fontFace: 'Aptos Display', fontSize: index === 0 ? 32 : 27, bold: true, color: '6CF5A5', breakLine: false, margin: 0.04 });
         if (item.bullets?.length) {
-          slide.addText(item.bullets.map(text => ({ text, options: { bullet: { indent: 18 }, hanging: 4, breakLine: true } })), { x: 0.9, y: 1.8, w: 10.9, h: 4.7, fontFace: 'Aptos', fontSize: 20, color: 'EAF8F0', paraSpaceAfterPt: 15, valign: 'middle', margin: 0.08, breakLine: false });
+          slide.addText(item.bullets.map(text => ({ text, options: { bullet: { indent: 18 }, hanging: 4, breakLine: true } })), { x: 0.9, y: 1.8, w: 10.9, h: 4.7, fontFace: 'Aptos', fontSize: 20, color: 'EAF8F0', paraSpaceAfter: 15, valign: 'middle', margin: 0.08, breakLine: false });
         }
         slide.addText(String(index + 1).padStart(2, '0'), { x: 11.8, y: 6.8, w: 0.7, h: 0.3, fontSize: 10, color: '91AA9A', align: 'right' });
       });
