@@ -111,11 +111,11 @@ function App() {
   const [thinkingOpen, setThinkingOpen] = useState(false);
   const [connectionStatus, setConnectionStatus] = useState('Not tested');
   const [connectionBusy, setConnectionBusy] = useState(false);
-  const [apiKeyDraft, setApiKeyDraft] = useState(() => readStore('lokizenith.api', { key: '', provider: 'groq', model: 'llama-3.3-70b-versatile', baseUrl: '' }).key);
-  const [activeApiKey, setActiveApiKey] = useState(() => readStore('lokizenith.api', { key: '', provider: 'groq', model: 'llama-3.3-70b-versatile', baseUrl: '' }).key);
-  const [apiProvider, setApiProvider] = useState(() => readStore('lokizenith.api', { key: '', provider: 'groq', model: 'llama-3.3-70b-versatile', baseUrl: '' }).provider);
-  const [apiModel, setApiModel] = useState(() => readStore('lokizenith.api', { key: '', provider: 'groq', model: 'llama-3.3-70b-versatile', baseUrl: '' }).model);
-  const [apiBaseUrl, setApiBaseUrl] = useState(() => readStore('lokizenith.api', { key: '', provider: 'groq', model: 'llama-3.3-70b-versatile', baseUrl: '' }).baseUrl);
+  const [apiKeyDraft, setApiKeyDraft] = useState('');
+  const [activeApiKey, setActiveApiKey] = useState('');
+  const [apiProvider, setApiProvider] = useState('openrouter');
+  const [apiModel, setApiModel] = useState('openrouter/auto');
+  const [apiBaseUrl, setApiBaseUrl] = useState('');
   const [backendUrl, setBackendUrl] = useState(() => readStore('lokizenith.server', ''));
   const [quizAnswers, setQuizAnswers] = useState<Record<string, number>>({});
   const [chatSearch, setChatSearch] = useState('');
@@ -376,7 +376,7 @@ function App() {
     try {
       const response = await api.post('/api/code', { apiKey: activeApiKey || undefined, provider: apiProvider, apiModel, apiBaseUrl, prompt: codePrompt.trim(), language: codeLanguage, mode: codeMode, existingCode: codeMode === 'edit' ? codeResult : '' });
       setCodeResult(response.data.code || ''); setCodePrompt(''); setToast('Code checked and ready to edit');
-    } catch { setToast('LokiCode could not connect. Check Settings → API & connection.'); }
+    } catch { setToast('LokiCode could not connect. Check the built-in OpenRouter service.'); }
     finally { setCodeBusy(false); setStatus(''); }
   };
   const regenerateAnswer = async (messageId: string, mode: 'regenerate' | 'continue' = 'regenerate') => {
@@ -497,7 +497,6 @@ function App() {
     'Privacy',
     'Chat & history',
     'Models',
-    'API & connection',
     'Voice & sound',
     'Files & uploads',
     'Accessibility',
@@ -1430,31 +1429,6 @@ function App() {
                         {model === m.id && <Check size={16} />}
                       </button>
                     ))}
-                  </>
-                ) : settingsTab === 'API & connection' ? (
-                  <>
-                    <p className="settings-intro">Choose your API provider and model, then paste your key. Groq, OpenRouter, Google Gemini, and custom OpenAI-compatible endpoints work for chat, LokiCode, and presentations.</p>
-                    <label className="api-key-input-label" htmlFor="lokizenith-backend-url">Lokizenith backend URL (required in the APK)</label>
-                    <input id="lokizenith-backend-url" className="api-key-input" type="url" inputMode="url" value={backendUrl} onChange={e => { const value = e.target.value.trim(); setBackendUrl(value); localStorage.setItem('lokizenith.server', JSON.stringify(value)); }} placeholder="https://your-lokizenith-backend.onrender.com" />
-                    <p className="small-note">This is the server hosting Lokizenith's /api endpoints, not the Groq/Gemini provider URL. Deploy the repository's render.yaml first, then paste the service URL here.</p>
-                    <label className="api-key-input-label" htmlFor="lokizenith-provider">API provider</label>
-                    <select id="lokizenith-provider" className="api-key-input" value={apiProvider} onChange={e => { const p = e.target.value; setApiProvider(p); if (p === 'groq') { setApiModel('llama-3.3-70b-versatile'); setApiBaseUrl(''); } else if (p === 'openrouter') { setApiModel('openrouter/auto'); setApiBaseUrl(''); } else if (p === 'gemini') { setApiModel('gemini-2.5-flash'); setApiBaseUrl(''); } else { setApiModel(''); setApiBaseUrl(''); } }}><option value="groq">Groq</option><option value="openrouter">OpenRouter</option><option value="gemini">Google Gemini</option><option value="custom">Custom OpenAI-compatible API</option></select>
-                    <label className="api-key-input-label" htmlFor="lokizenith-model">Model ID</label>
-                    <input id="lokizenith-model" className="api-key-input" value={apiModel} onChange={e => setApiModel(e.target.value)} placeholder="Enter the model ID from your provider" />
-                    {apiProvider === 'custom' && <><label className="api-key-input-label" htmlFor="lokizenith-base-url">API base URL</label><input id="lokizenith-base-url" className="api-key-input" value={apiBaseUrl} onChange={e => setApiBaseUrl(e.target.value)} placeholder="https://your-provider.example/v1" /></>}
-                    <div className="api-key-card api-key-inline-card">
-                      <div className="api-key-card-icon"><ShieldCheck size={22} /></div>
-                      <div className="api-key-card-copy"><b>{activeApiKey ? 'Your API key is saved on this device' : 'Use your own API key'}</b><small>{activeApiKey ? 'Your selected provider, model and key are restored on your next visit in this browser. Anyone with access to this browser profile may be able to use the saved key.' : 'Submit your key to save it in this browser for the next visit. Avoid saving keys on shared devices.'}</small></div>
-                    </div>
-                    <label className="api-key-input-label" htmlFor="lokizenith-api-key">{apiProvider === 'openrouter' ? 'OpenRouter API key' : apiProvider === 'groq' ? 'Groq API key' : apiProvider === 'gemini' ? 'Google Gemini API key' : 'Provider API key'}</label>
-                    <input id="lokizenith-api-key" className="api-key-input" type="password" autoComplete="new-password" spellCheck={false} value={apiKeyDraft} onChange={e => setApiKeyDraft(e.target.value)} placeholder={'Paste your ' + (apiProvider === 'openrouter' ? 'OpenRouter' : apiProvider === 'groq' ? 'Groq' : apiProvider === 'gemini' ? 'Gemini' : 'provider') + ' API key here'} />
-                    <div className="api-key-actions">
-                      <button className="primary-small" onClick={saveCustomApiKey}><Check size={15} /> Submit / use this key</button>
-                      <button className="outline-action" onClick={() => void testConnection()} disabled={connectionBusy}>{connectionBusy ? 'Testing…' : 'Test connection'} <Activity size={15} /></button>
-                      {activeApiKey && <button className="outline-action" onClick={clearCustomApiKey}>Use app default</button>}
-                    </div>
-                    <div className="connection-status"><span className="online-dot" /><div><b>Connection test</b><small>{connectionStatus}</small></div></div>
-                    <p className="small-note">Text chat, LokiCode, and presentations use the selected provider. Image generation currently requires Gemini. Your API key is saved in this browser's local storage so it survives refreshes and future visits; use this only on a device/profile you trust. Never paste API keys into chat.</p>
                   </>
                 ) : settingsTab === 'Voice & sound' ? (
                   <>
