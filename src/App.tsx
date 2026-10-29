@@ -1555,7 +1555,7 @@ function App() {
                 onClick={() => {
                   localStorage.setItem('lokizenith.prefs', JSON.stringify(prefs));
                   localStorage.setItem('lokizenith.api', JSON.stringify({ key: activeApiKey || apiKeyDraft.trim(), provider: apiProvider, model: apiModel.trim(), baseUrl: apiBaseUrl.trim() }));
-                  localStorage.setItem('lokizenith.server', JSON.stringify(backendUrl.trim().replace(/\\/+$/, '')));
+                  localStorage.setItem('lokizenith.server', JSON.stringify(backendUrl.trim().replace(/\/+$/, '')));
                   if (apiKeyDraft.trim()) setActiveApiKey(apiKeyDraft.trim());
                   setSettingsOpen(false);
                   setToast('Settings saved on this device');
