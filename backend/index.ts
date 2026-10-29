@@ -161,9 +161,14 @@ const routeTable: Record<string, Array<(context: any) => Promise<any>>> = {
       if (!text) throw new Error('Gemini returned an empty test response.');
       return json({ ok: true, provider: 'Google Gemini', model: DEFAULT_MODEL, message: 'The Gemini API connection works.' });
     } catch (e) {
-      console.error('Gemini connection test failed', e);
+      console.error('Provider connection test failed', e);
       const message = e instanceof Error ? e.message : 'Unknown provider error';
-      return error(message.includes('API_KEY_INVALID') || message.includes('API key not valid') ? 'Google rejected the configured API key.' : 'Gemini connection test failed: ' + message, 502);
+      const provider = (input.provider || 'gemini').toLowerCase();
+      const prefix = provider === 'gemini' ? 'Gemini' : provider === 'groq' ? 'Groq' : provider === 'openrouter' ? 'OpenRouter' : 'Custom API';
+      const friendly = provider === 'gemini' && (message.includes('API_KEY_INVALID') || message.includes('API key not valid'))
+        ? 'Google rejected the configured API key.'
+        : prefix + ' connection test failed: ' + message;
+      return error(friendly, 502);
     }
   }],
   'POST /api/chat': [async ({ body }) => {
