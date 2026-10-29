@@ -1,8 +1,13 @@
 type ApiResponse<T> = { data: T };
 
-const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || '').trim().replace(/\/+$/, '');
+function configuredApiBaseUrl() {
+  let saved = '';
+  try { saved = JSON.parse(localStorage.getItem('lokizenith.server') || '""') as string; } catch { /* Ignore invalid local settings. */ }
+  return (saved || import.meta.env.VITE_API_BASE_URL || '').trim().replace(/\/+$/, '');
+}
 
 function apiUrl(url: string) {
+  const API_BASE_URL = configuredApiBaseUrl();
   if (/^https?:\/\//i.test(url)) return url;
   const path = url.startsWith('/') ? url : '/' + url;
   return API_BASE_URL ? API_BASE_URL + path : path;
@@ -17,9 +22,9 @@ async function request<T>(method: string, url: string, body?: unknown): Promise<
       ...(body === undefined ? {} : { body: JSON.stringify(body) }),
     });
   } catch {
-    throw new Error(API_BASE_URL
+    throw new Error(configuredApiBaseUrl()
       ? 'Cannot reach the Lokizenith API server. Check the backend URL and that the server is running.'
-      : 'The Lokizenith API server is not configured in this APK. The app needs its online backend URL; a relative /api request here returns the app HTML, not the API.');
+      : 'The Lokizenith API server is not configured. Enter the deployed backend URL in Settings → API & connection.');
   }
 
   const contentType = response.headers.get('content-type') || '';
