@@ -439,7 +439,7 @@ function App() {
   const testConnection = async () => {
     setConnectionBusy(true); setConnectionStatus('Testing ' + apiProvider + ' connection…');
     try {
-      const response = await api.post('/api/test-connection', { apiKey: activeApiKey || undefined, provider: apiProvider, apiModel, apiBaseUrl });
+      const response = await api.post('/api/test-connection', { apiKey: apiKeyDraft.trim() || activeApiKey || undefined, provider: apiProvider, apiModel, apiBaseUrl });
       setConnectionStatus(response.data.message || 'Connection successful');
     } catch (e) {
       const message = e instanceof Error ? e.message : 'Check the key and try again.';
