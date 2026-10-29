@@ -13,8 +13,10 @@ const secretNames = () => ['LOKIZENITH_CUSTOM_API_KEY', 'LOKIZENITH_GEMINI_API_K
 async function scrapeUrl(url: string) {
   const response = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0 (compatible; LokizenithAI/1.0)' }, signal: AbortSignal.timeout(12000) });
   const html = await response.text();
+  const titleMatch = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
+  const title = titleMatch?.[1]?.replace(/<[^>]+>/g, ' ').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/\s+/g, ' ').trim() || '';
   const text = html.replace(/<script[\s\S]*?<\/script>/gi, ' ').replace(/<style[\s\S]*?<\/style>/gi, ' ').replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/\s+/g, ' ').trim();
-  return { status: response.status, text: text.slice(0, 5000) };
+  return { status: response.status, title, text: text.slice(0, 5000) };
 }
 
 type ChatMessage = {
